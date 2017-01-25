@@ -103,4 +103,38 @@ module.exports = class TraceObject extends EventEmitter {
     if (this.parentNode) return this.parentNode.closest(fn)
     return null
   }
+
+  addKeys (props) {
+    for (let prop in props) {
+      let property = this
+      for (let key of prop.split('.')) {
+        property = property[key]
+        if (!property) break
+      }
+      if (!property) {
+        console.warn('property not found: ' + prop)
+        continue
+      }
+
+      let val = props[prop]
+      let didWarn = false
+      if (typeof val === 'object') {
+        for (let time in val) {
+          if (!Number.isFinite(parseFloat(time))) {
+            this.addKeys({ [`${prop}.${time}`]: val[time] })
+            continue
+          }
+          let v = val[time]
+          if (!Array.isArray(v)) v = [v]
+          if (property.addKey) property.addKey(parseFloat(time), ...v)
+          else if (!didWarn) {
+            console.warn(prop + ' has no addKey method')
+            didWarn = true
+          }
+        }
+      } else {
+        property.defaultValue = val
+      }
+    }
+  }
 }

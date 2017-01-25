@@ -46,29 +46,27 @@ const createContext = function (title, duration) {
   const viewport = createContext('Object Transform Test', 6)
   const object = new Trace.Object()
   viewport.addChild(object)
-  object.transform.translateX.addKey(0, 240)
-  object.transform.translateY.addKey(0, 180)
-  object.transform.translateX.addKey(1, 140)
-  object.transform.scaleX.addKey(1, 1)
-  object.transform.scaleX.addKey(2, 2)
-  object.transform.scaleY.addKey(1.5, 1)
-  object.transform.scaleY.addKey(2.5, 2)
-  object.transform.rotateZ.addKey(3, 0)
-  object.transform.rotateZ.addKey(4, Math.PI)
-  object.transform.skewX.addKey(4, 0)
-  object.transform.skewX.addKey(5, Math.PI)
-  object.transform.skewY.addKey(5, 0)
-  object.transform.skewY.addKey(6, -Math.PI)
+  object.addKeys({
+    transform: {
+      translateX: { 0: 240, 1: 140 },
+      translateY: 180,
+      scaleX: { 1: 1, 2: 2 },
+      scaleY: { 1.5: 1, 2.5: 2 },
+      rotateZ: { 3: 0, 4: Math.PI },
+      skewX: { 4: 0, 5: Math.PI },
+      skewY: { 5: 0, 6: -Math.PI }
+    }
+  })
+  window.o = object
 }
 {
   const viewport = createContext('Object Opacity Test', 2)
   const object = new Trace.Object()
   viewport.addChild(object)
-  object.transform.translateX.addKey(0, 240)
-  object.transform.translateY.addKey(0, 180)
-  object.opacity.addKey(0, 1)
-  object.opacity.addKey(1, 0)
-  object.opacity.addKey(2, 1)
+  object.addKeys({
+    transform: { translateX: 240, translateY: 180 },
+    opacity: { 0: 1, 1: 0, 2: 1 }
+  })
 }
 {
   const viewport = createContext('Spring Interpolator Test', 5)
@@ -76,12 +74,18 @@ const createContext = function (title, duration) {
   viewport.addChild(object)
   object.transform.translateX.interpolator = Trace.AnimatedNumber.springInterpolator
   object.transform.translateX.interpolatorSettings = { spring: [300, 20] }
-  object.transform.translateX.addKey(0, 240)
-  object.transform.translateY.addKey(0, 180)
-  object.transform.translateX.addKey(1, 140, Trace.Easing.step)
-  object.transform.translateX.addKey(2, 340, Trace.Easing.step)
-  object.transform.translateX.addKey(3, 140, Trace.Easing.step)
-  object.transform.translateX.addKey(3.2, 340, Trace.Easing.step)
+  object.addKeys({
+    transform: {
+      translateX: {
+        0: 240,
+        1: [140, Trace.Easing.step],
+        2: [340, Trace.Easing.step],
+        3: [140, Trace.Easing.step],
+        3.2: [340, Trace.Easing.step]
+      },
+      translateY: 180
+    }
+  })
 }
 {
   const viewport = createContext('Easing Test', 3)
@@ -113,40 +117,34 @@ const createContext = function (title, duration) {
   const viewport = createContext('ClippedText Test', 8)
   const ct = new Trace.ClippedText()
   viewport.addChild(ct)
-  ct.transform.translateX.addKey(0, 240)
-  ct.transform.translateY.addKey(0, 180)
-  ct.text.addKey(0, 'Something')
-  ct.text.addKey(1, 'Text text text text text')
-  ct.clip.addKey(1, 0)
-  ct.clip.addKey(2, -1, Trace.Easing.easeInExpo)
-  ct.clip.addKey(3, 1, Trace.Easing.easeInOutQuad)
-  ct.clip.addKey(3.2, 0.5, Trace.Easing.easeOutBack)
-  ct.compensation.addKey(3.2, 0)
-  ct.compensation.addKey(3.7, 1, Trace.Easing.easeInOutExpo)
-  ct.skew.addKey(4, 0)
-  ct.skew.addKey(4.5, Math.PI / 3, Trace.Easing.easeInOutQuad)
-  ct.color.addKey(4.5, '#000')
-  ct.color.addKey(5, '#66baa6', Trace.Easing.easeOutExpo)
-  ct.family.addKey(0, 'sans-serif')
-  ct.family.addKey(4.5, '"Source Code Pro", Roboto, monospace')
-  ct.weight.addKey(5, 400)
-  ct.weight.addKey(5.5, 100)
-  ct.weight.addKey(6, 900, Trace.Easing.easeOutQuad)
-  ct.weight.addKey(6.1, 400)
-  ct.style.addKey(0, 'normal')
-  ct.style.addKey(6, 'italic')
-  ct.align.addKey(0, 'center')
-  ct.align.addKey(6.5, 'left')
-  ct.align.addKey(7, 'right')
-  ct.baseline.addKey(0, 'middle')
-  ct.baseline.addKey(6.5, 'top')
-  ct.baseline.addKey(7, 'bottom')
-  ct.baseline.addKey(7.1, 'middle')
-  ct.align.addKey(7.1, 'center')
-  ct.clip.addKey(7.5, Trace.AnimatedValue.PREV_KEY)
-  ct.clip.addKey(8, 0, Trace.Easing.easeOutExpo)
-  ct.color.addKey(7.5, Trace.AnimatedValue.PREV_KEY)
-  ct.color.addKey(8, '#000')
+  ct.addKeys({
+    transform: { translateX: 240, translateY: 180 },
+    text: {
+      0: 'Something',
+      1: 'Text text text text text'
+    },
+    clip: {
+      1: 0,
+      2: [-1, Trace.Easing.easeInExpo],
+      3: [1, Trace.Easing.easeInOutQuad],
+      3.2: [0.5, Trace.Easing.easeOutBack],
+      7.5: Trace.AnimatedValue.PREV_KEY,
+      8: [0, Trace.Easing.easeOutExpo]
+    },
+    compensation: { 3.2: 0, 3.7: [1, Trace.Easing.easeInOutExpo] },
+    skew: { 4: 0, 4.5: [Math.PI / 4, Trace.Easing.easeInOutQuad] },
+    color: {
+      4.5: '#000',
+      5.5: ['#66baa6', Trace.Easing.easeOutQuart],
+      7.5: Trace.AnimatedValue.PREV_KEY,
+      8: '#000'
+    },
+    family: { 0: 'sans-serif', 4.5: '"Source Code Pro", Roboto, monospace' },
+    weight: { 5: 400, 5.5: 100, 6: [900, Trace.Easing.easeOutQuad], 6.1: 400 },
+    style: { 0: 'normal', 6: 'italic' },
+    align: { 0: 'center', 6.5: 'left', 7: 'right', 7.1: 'center' },
+    baseline: { 0: 'middle', 6.5: 'top', 7: 'bottom', 7.1: 'middle' }
+  })
 }
 {
   const viewport = createContext('ClippedContainer Test', 3)
