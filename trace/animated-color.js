@@ -19,8 +19,8 @@ module.exports = class AnimatedColor extends AnimatedValue {
       if (time > currentTime && time < closestRight) closestRight = time
     }
 
-    let left = keys.get(closestLeft)
-    let right = keys.get(closestRight)
+    let left = AnimatedValue.resolveKey(keys, closestLeft, defaultValue)
+    let right = AnimatedValue.resolveKey(keys, closestRight, defaultValue)
 
     // parse colors with failsafe
     let leftColor = left ? (color(left[0]) || color([0, 0, 0, 0])) : null
@@ -36,8 +36,8 @@ module.exports = class AnimatedColor extends AnimatedValue {
     if (!Number.isFinite(closestRight)) return leftColor.toRgbString()
 
     // interpolate value
-    let leftArray = leftColor.toRgbaArray()
-    let rightArray = rightColor.toRgbaArray()
+    let leftArray = leftColor.toRgbaArray() || [0, 0, 0, 0]
+    let rightArray = rightColor.toRgbaArray() || [0, 0, 0, 0]
 
     let intervalTime = (currentTime - closestLeft) / (closestRight -
       closestLeft)

@@ -22,8 +22,10 @@ module.exports = class AnimatedString extends AnimatedValue {
       return defaultValue
     }
     // return the right key's value if there are none on the left
-    if (!Number.isFinite(closestLeft)) return keys.get(closestRight)[0]
+    if (!Number.isFinite(closestLeft)) {
+      return AnimatedValue.resolveKey(keys, closestRight, defaultValue)[0]
+    }
     // return the left key's value
-    return keys.get(closestLeft)[0]
+    return AnimatedValue.resolveKey(keys, closestLeft, defaultValue)[0]
   }
 }

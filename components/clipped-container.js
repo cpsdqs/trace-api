@@ -19,7 +19,7 @@ module.exports = class ClippedContainer extends Trace.Object {
       }
     }
 
-    ctx.save()
+    ctx.restore()
   }
 
   drawSelf () {

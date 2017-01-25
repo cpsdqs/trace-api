@@ -73,7 +73,7 @@ module.exports = {
     return Math.sqrt(1 - (--t) * t)
   },
   easeInOutCirc (t) {
-    return t < 0.5 ? (0.5 * (Math.sqrt(1 - (4 * t * t)) - 1))
+    return t < 0.5 ? (-0.5 * (Math.sqrt(1 - (4 * t * t)) - 1))
       : (0.5 * (Math.sqrt(1 - (2 * t - 2) * (2 * t - 2)) + 1))
   },
 

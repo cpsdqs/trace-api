@@ -28,8 +28,8 @@ module.exports = class AnimatedNumber extends AnimatedValue {
     if (!Number.isFinite(closestRight)) return keys.get(closestLeft)[0]
 
     // interpolate value
-    let left = keys.get(closestLeft)
-    let right = keys.get(closestRight)
+    let left = AnimatedValue.resolveKey(keys, closestLeft, defaultValue)
+    let right = AnimatedValue.resolveKey(keys, closestRight, defaultValue)
     // current time within the interval from 0 to 1
     let intervalTime = (currentTime - closestLeft) / (closestRight -
       closestLeft)
@@ -57,9 +57,11 @@ module.exports = class AnimatedNumber extends AnimatedValue {
       }
       // set springPosition to the closest key's value, 0 otherwise
       if (Number.isFinite(closestLeft)) {
-        interpolatorSettings.springPosition = keys.get(closestLeft)[0]
+        interpolatorSettings.springPosition = AnimatedValue
+          .resolveKey(keys, closestLeft, defaultValue)[0]
       } else if (Number.isFinite(closestRight)) {
-        interpolatorSettings.springPosition = keys.get(closestRight)[0]
+        interpolatorSettings.springPosition = AnimatedValue
+          .resolveKey(keys, closestRight, defaultValue)[0]
       } else interpolatorSettings.springPosition = defaultValue
       // initial velocity is always 0
       interpolatorSettings.springVelocity = 0
