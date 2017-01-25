@@ -57,7 +57,6 @@ const createContext = function (title, duration) {
       skewY: { 5: 0, 6: -Math.PI }
     }
   })
-  window.o = object
 }
 {
   const viewport = createContext('Object Opacity Test', 2)
