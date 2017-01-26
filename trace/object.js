@@ -118,15 +118,22 @@ module.exports = class TraceObject extends EventEmitter {
 
       let val = props[prop]
       let didWarn = false
+      let lastTime = 0
       if (typeof val === 'object') {
         for (let time in val) {
-          if (!Number.isFinite(parseFloat(time))) {
+          if (!time.match(/^[+-]?(?:\d+?(?:\.\d+?)?|\.\d+?)?$/)) {
             this.addKeys({ [`${prop}.${time}`]: val[time] })
             continue
           }
+          let t = parseFloat(time)
+          if (time.match(/^[+-]/)) {
+            t = lastTime + (time.match(/^\+/) ? 1 : -1) *
+              parseFloat(time.substr(1))
+          }
+          lastTime = t
           let v = val[time]
           if (!Array.isArray(v)) v = [v]
-          if (property.addKey) property.addKey(parseFloat(time), ...v)
+          if (property.addKey) property.addKey(t, ...v)
           else if (!didWarn) {
             console.warn(prop + ' has no addKey method')
             didWarn = true

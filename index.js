@@ -1,4 +1,5 @@
 {
+  require('./extra/reset-transform')
   let exports = require('./trace')
   try {
     let components = require('./components')

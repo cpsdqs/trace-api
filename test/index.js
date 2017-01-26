@@ -10,11 +10,7 @@ const createContext = function (title, duration) {
   canvas.width = 480 * window.devicePixelRatio
   canvas.height = 360 * window.devicePixelRatio
 
-  const ctx = canvas.getContext('2d')
-  // polyfill resetTransform
-  ctx.resetTransform = function () { ctx.setTransform(1, 0, 0, 1, 0, 0) }
-
-  const timeline = new Trace.Timeline(ctx)
+  const timeline = new Trace.Timeline(canvas.getContext('2d'))
   const viewport = new Trace.Viewport()
   timeline.addChild(viewport)
   timeline.duration = duration
@@ -50,11 +46,11 @@ const createContext = function (title, duration) {
     transform: {
       translateX: { 0: 240, 1: 140 },
       translateY: 180,
-      scaleX: { 1: 1, 2: 2 },
-      scaleY: { 1.5: 1, 2.5: 2 },
-      rotateZ: { 3: 0, 4: Math.PI },
-      skewX: { 4: 0, 5: Math.PI },
-      skewY: { 5: 0, 6: -Math.PI }
+      scaleX: { 1: 1, '+1': 2 },
+      scaleY: { 1.5: 1, '+1': 2 },
+      rotateZ: { 3: 0, '+1': Math.PI },
+      skewX: { 4: 0, '+1': Math.PI },
+      skewY: { 5: 0, '+1': -Math.PI }
     }
   })
 }
