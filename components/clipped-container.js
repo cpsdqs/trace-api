@@ -15,6 +15,7 @@ module.exports = class ClippedContainer extends Trace.Object {
 
     for (let node of children) {
       if (values.get(node)[1] === true) {
+        Trace.Utils.resetCtx(ctx)
         node.draw(ctx, transform, currentTime, deltaTime)
       }
     }
