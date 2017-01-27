@@ -78,6 +78,10 @@ module.exports = class Timeline extends TraceObject {
     this.emit('loopend')
   }
 
+  drawCurrent () {
+    this.draw(this.ctx, identityTransform, this.currentTime, 0)
+  }
+
   play () {
     if (this.paused) {
       this.paused = false
