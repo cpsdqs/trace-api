@@ -96,8 +96,8 @@ module.exports = class TraceObject extends EventEmitter {
     childNode.emit('connected')
   }
   removeChild (childNode) {
-    return this.children.delete(childNode)
     childNode.emit('disconnected')
+    return this.children.delete(childNode)
   }
   hasChild (childNode) {
     return this.children.has(childNode)
