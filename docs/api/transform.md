@@ -15,9 +15,9 @@ Represents an object's transform.
 - `scaleY`
 - `scaleZ`
 
-All propeties are instances of [`AnimatedNumber`](AnimatedNumber.md) and have a default value of `0`, except for `scaleX/Y/Z` which have a default value of `1`.
+All propeties are instances of [`AnimatedNumber`](animated-number.md) and have a default value of `0`, except for `scaleX/Y/Z` which have a default value of `1`.
 
-The `translateZ`, `rotateX/Y`, `skewZ` and `scaleZ` properties are useless when used for an [`Object`](Object.md)'s `transform`.
+The `translateZ`, `rotateX/Y`, `skewZ` and `scaleZ` properties are useless when used for an [`Object`](object.md)'s `transform`.
 
 ## Methods
 ### `getMatrix(currentTime, deltaTime)`

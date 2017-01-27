@@ -1,4 +1,6 @@
 # Viewport
+**extends [`Object`](object.md)**
+
 Scales everything to fit a canvas.
 
 ## Properties

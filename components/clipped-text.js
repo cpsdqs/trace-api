@@ -41,7 +41,6 @@ module.exports = class ClippedText extends Trace.Object {
   }
 
   drawSelf (ctx, transform, currentTime, deltaTime) {
-    Trace.Utils.resetCtx(ctx)
     Trace.Utils.setTransformMatrix(ctx, transform)
 
     const opacity = this.opacity.getValue(currentTime, deltaTime)

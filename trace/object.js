@@ -20,6 +20,9 @@ module.exports = class TraceObject extends EventEmitter {
     this.on('connected', () => {
       for (let i of this.children.values()) i.emit('connected')
     })
+    this.on('disconnected', () => {
+      for (let i of this.children.values()) i.emit('disconnected')
+    })
   }
 
   sortChildren (currentTime, deltaTime) {
@@ -42,7 +45,7 @@ module.exports = class TraceObject extends EventEmitter {
 
     for (let node of children) {
       if (values.get(node)[1] === true) {
-        Trace.Utils.resetCtx(ctx)
+        Utils.resetCtx(ctx)
         node.draw(ctx, transform, currentTime, deltaTime)
       }
     }
@@ -94,6 +97,7 @@ module.exports = class TraceObject extends EventEmitter {
   }
   removeChild (childNode) {
     return this.children.delete(childNode)
+    childNode.emit('disconnected')
   }
   hasChild (childNode) {
     return this.children.has(childNode)

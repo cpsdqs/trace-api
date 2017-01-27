@@ -23,7 +23,7 @@ The `easing` property must be an object containing the following items:
 Signature: `interpolator(currentTime, keys, deltaTime, interpolatorSettings)`
 
 - `currentTime` Number
-- `keys` Object
+- `keys` Map
 - `deltaTime` Number
 - `interpolatorSettings`: `this`
 
@@ -48,3 +48,14 @@ Returns the value at the given time.
 - `deltaTime` Number
 
 See above.
+
+### `resolveKey(keys, time, defaultValue)`
+- `keys` Map
+- `time` Number - Key for `keys` in which the key is specified
+- `defaultValue` - Default value, in case no value can be found
+
+Returns the key's value if `keys` yields one, though if the value is `AnimatedValue.PREV_KEY` the previous key's, or the default value.
+
+## Static Properties
+### `PREV_KEY`
+Tells the interpolator to use the previous key's value instead.

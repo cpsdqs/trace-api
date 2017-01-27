@@ -1,4 +1,6 @@
 # Timeline
+**extends [`Object`](object.md)**
+
 Controls playback.
 
 Note that this class can be added as a child and may inherit `currentTime` from the parent if the parent's `drawChildren` is called.
@@ -52,6 +54,11 @@ A function called to schedule the next frame.
 
 When the draw method was last called. (Result of `Date.now()`)
 
+### `markers`
+**Default**: `new Map()`
+
+A `Map<time,value>`. If the value is `0`, the playback will stop when the marker is passed.
+
 ## Methods
 ### `play()`
 Returns true if state was changed.
@@ -75,3 +82,19 @@ Stops the draw loop.
 
 ### `drawLoop()`
 Recursive draw loop.
+
+### `drawCurrent()`
+Draws the current frame without starting the draw loop.
+
+## Events
+### `timeupdate`
+Emitted when the current time changes (due to the draw loop), before drawing.
+
+### `loopend`
+Emitted at the end of each draw loop (after drawing).
+
+### `end`
+Emitted when playback ends.
+
+### `play`, `pause`, `run`, `stop`
+Emitted when the respective methods are called.
