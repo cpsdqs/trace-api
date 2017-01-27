@@ -175,13 +175,16 @@ const topCanvas = document.querySelector('#top-canvas')
   timeline.play()
   timeline.duration = 5
   let isWhite = false
+  let scrollIndicator = document.querySelector('#scroll-indicator')
   timeline.on('timeupdate', () => {
     if (timeline.currentTime >= timeline.duration) timeline.stop()
     if (timeline.currentTime > 3 && !isWhite) {
       document.body.classList.add('white')
+      scrollIndicator.classList.add('visible')
       isWhite = true
     } else if (timeline.currentTime < 3 && isWhite) {
       document.body.classList.remove('white')
+      scrollIndicator.classList.remove('visible')
       isWhite = false
     }
   })

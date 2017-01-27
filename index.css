@@ -26,6 +26,45 @@ body.white {
   height: 100%;
 }
 
+#scroll-indicator {
+  position: absolute;
+  left: 50%;
+  bottom: 2em;
+  opacity: 0;
+  transition: opacity 3s;
+}
+#scroll-indicator::before,
+#scroll-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1em;
+  height: 1px;
+  border-radius: 0.5px;
+  background: #f54784;
+  transform-origin: 0 0.5px;
+  transform: rotate(-45deg);
+}
+#scroll-indicator::after {
+  transform: rotate(-135deg);
+}
+@keyframes scroll-indicator-bob {
+  0% {
+    transform: none
+  }
+  50% {
+    transform: translateY(0.5em);
+  }
+  100% {
+    transform: none;
+  }
+}
+#scroll-indicator.visible {
+  opacity: 1;
+  animation: scroll-indicator-bob 2s infinite cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
 #content-wrap {
   background: #000;
   z-index: 1;
