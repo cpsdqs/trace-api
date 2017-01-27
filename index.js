@@ -177,10 +177,10 @@ const topCanvas = document.querySelector('#top-canvas')
   let isWhite = false
   timeline.on('timeupdate', () => {
     if (timeline.currentTime >= timeline.duration) timeline.stop()
-    if (timeline.currentTime > 2.3 && !isWhite) {
+    if (timeline.currentTime > 3 && !isWhite) {
       document.body.classList.add('white')
       isWhite = true
-    } else if (timeline.currentTime < 2.3 && isWhite) {
+    } else if (timeline.currentTime < 3 && isWhite) {
       document.body.classList.remove('white')
       isWhite = false
     }
