@@ -83,7 +83,9 @@ Stops the draw loop.
 ### `drawLoop()`
 Recursive draw loop.
 
-### `drawCurrent()`
+### `drawCurrent(dt)`
+- `dt` Number - Value to be passed for delta time (Default: `0`)
+
 Draws the current frame without starting the draw loop.
 
 ## Events

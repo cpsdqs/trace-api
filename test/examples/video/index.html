@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>video</title>
+    <style>
+#render-canvas {
+  width: 480px;
+  height: 270px;
+  background: #f00;
+}
+    </style>
+  </head>
+  <body>
+    <button id="start">Start</button><br />
+    <canvas id="render-canvas" width="960" height="540"></canvas>
+    <video id="output-video" controls></video>
+    <script src="whammy.js"></script>
+    <script src="../../../dist/bundle.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

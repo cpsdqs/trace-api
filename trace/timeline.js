@@ -78,8 +78,8 @@ module.exports = class Timeline extends TraceObject {
     this.emit('loopend')
   }
 
-  drawCurrent () {
-    this.draw(this.ctx, identityTransform, this.currentTime, 0)
+  drawCurrent (dt) {
+    this.draw(this.ctx, identityTransform, this.currentTime, dt || 0)
   }
 
   play () {
