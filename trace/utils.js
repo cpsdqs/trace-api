@@ -1,7 +1,11 @@
 module.exports = {
   setTransformMatrix (ctx, matrix) {
-    ctx.setTransform(matrix[0], matrix[1], matrix[3], matrix[4], matrix[6],
-      matrix[7])
+    // a b 0 0
+    // c d 0 0
+    // 0 0 1 0
+    // e f 0 1
+    ctx.setTransform(matrix[0], matrix[1], matrix[4], matrix[5], matrix[12],
+      matrix[13])
   },
 
   resetCtx (ctx) {

@@ -38,14 +38,14 @@ module.exports = class Viewport extends TraceObject {
 
   draw (ctx, parentTransform, currentTime, deltaTime) {
     let rawTransform = this.transform.getMatrix(currentTime, deltaTime)
-    let transform = glMatrix.mat3.create()
-    glMatrix.mat3.multiply(transform, parentTransform, rawTransform)
+    let transform = glMatrix.mat4.create()
+    glMatrix.mat4.multiply(transform, parentTransform, rawTransform)
 
     let size = this.getContentPos()
     let dp = this.canvasScale
-    glMatrix.mat3.translate(transform, transform, [size.x * dp, size.y * dp])
-    glMatrix.mat3.scale(transform, transform,
-      [size.scale * dp, size.scale * dp])
+    glMatrix.mat4.translate(transform, transform, [size.x * dp, size.y * dp, 0])
+    glMatrix.mat4.scale(transform, transform,
+      [size.scale * dp, size.scale * dp, 1])
 
     this.drawSelf(ctx, transform, currentTime, deltaTime)
     ctx.save()

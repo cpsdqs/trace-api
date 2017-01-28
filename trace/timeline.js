@@ -1,6 +1,6 @@
 const TraceObject = require('./object')
 
-let identityTransform = [1, 0, 0, 0, 1, 0, 0, 0, 1]
+let identityTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
 
 module.exports = class Timeline extends TraceObject {
   constructor (ctx) {

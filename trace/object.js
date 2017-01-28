@@ -53,8 +53,8 @@ module.exports = class TraceObject extends EventEmitter {
 
   draw (ctx, parentTransform, currentTime, deltaTime) {
     let rawTransform = this.transform.getMatrix(currentTime, deltaTime)
-    let transform = glMatrix.mat3.create()
-    glMatrix.mat3.multiply(transform, parentTransform, rawTransform)
+    let transform = glMatrix.mat4.create()
+    glMatrix.mat4.multiply(transform, parentTransform, rawTransform)
 
     this.drawSelf(ctx, transform, currentTime, deltaTime)
     this.drawChildren(ctx, transform, currentTime, deltaTime)
