@@ -9,7 +9,7 @@ const topCanvas = document.querySelector('#top-canvas')
     let rect = topCanvas.getBoundingClientRect()
     viewport.canvasWidth = topCanvas.width = window.devicePixelRatio * rect.width
     viewport.canvasHeight = topCanvas.height = window.devicePixelRatio * rect.height
-    timeline.draw(timeline.ctx, [1, 0, 0, 0, 1, 0, 0, 0, 1], timeline.currentTime, 0)
+    timeline.drawCurrent()
   }
   resizeTopCanvas()
   window.addEventListener('resize', resizeTopCanvas)
@@ -29,7 +29,6 @@ const topCanvas = document.querySelector('#top-canvas')
       this.color = '#fff'
     }
     drawSelf (ctx, transform, currentTime, deltaTime) {
-      Trace.Utils.resetCtx(ctx)
       Trace.Utils.setTransformMatrix(ctx, transform)
 
       const radius = this.radius.getValue(currentTime, deltaTime)
@@ -287,7 +286,7 @@ const topCanvas = document.querySelector('#top-canvas')
       timeline.currentTime = 0
       didPlay = false
       timeline.stop()
-      timeline.draw(timeline.ctx, [1, 0, 0, 0, 1, 0, 0, 0, 1], 0, 0)
+      timeline.drawCurrent()
     }
   }, true)
 }
