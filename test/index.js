@@ -164,3 +164,71 @@ const createContext = function (title, duration) {
     ctx.clip()
   }
 }
+{
+  const viewport = createContext('Color Test', 3)
+  class ColorSquare extends Trace.Object {
+    constructor () {
+      super()
+      this.color = new Trace.AnimatedColor('black')
+      viewport.addChild(this)
+    }
+    drawSelf (ctx, transform, currentTime, deltaTime) {
+      Trace.Utils.setTransformMatrix(ctx, transform)
+      ctx.fillStyle = this.color.getValue(currentTime, deltaTime)
+      ctx.fillRect(0, 0, 20, 20)
+    }
+  }
+  let cycle = {
+    0: '#f00', 1: '#0f0', 2: '#00f', 3: '#f00'
+  }
+  let a = new ColorSquare()
+  a.addKeys({ color: cycle })
+  let b = new ColorSquare()
+  b.addKeys({
+    transform: { translateX: 20 },
+    color: cycle
+  })
+  b.color.interpolatorSettings = { model: 'hsl' }
+  let c = new ColorSquare()
+  c.addKeys({
+    transform: { translateX: 40 },
+    color: {
+      0: 'rgba(127, 0, 0, 0.5)',
+      1: '#f00'
+    }
+  })
+  let rainbow = new ColorSquare()
+  rainbow.addKeys({
+    transform: { translateX: 60 },
+    color: { 0: '#f00', 3: '#f01'}
+  })
+  rainbow.color.interpolatorSettings = { model: 'hsl' }
+  let newCycle = function (x, model) {
+    let d = new ColorSquare()
+    d.addKeys({
+      transform: { translateX: x, translateY: 20 },
+      color: cycle
+    })
+    d.color.interpolatorSettings = { model }
+    let label = new Trace.ClippedText()
+    viewport.addChild(label)
+    label.addKeys({
+      transform: { translateX: x + 10, translateY: 50, rotateZ: Math.PI / 4 },
+      text: model,
+      size: 12,
+      align: 'left'
+    })
+  }
+  newCycle(0, 'rgb')
+  newCycle(20, 'hsl')
+  newCycle(40, 'hsv')
+  newCycle(60, 'hwb')
+  newCycle(80, 'cmyk')
+  newCycle(100, 'xyz')
+  newCycle(120, 'lab')
+  newCycle(140, 'lch')
+  newCycle(160, 'ansi16')
+  newCycle(180, 'ansi256')
+  newCycle(200, 'hcg')
+  newCycle(220, 'apple')
+}

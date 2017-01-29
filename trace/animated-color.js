@@ -1,6 +1,11 @@
-const color = require('css-color-converter')
+const color = require('color')
 const AnimatedValue = require('./animated-value')
 const Easing = require('./easing')
+
+const black = color()
+
+const validModels = []
+for (let i in color) if (i) validModels.push(i)
 
 module.exports = class AnimatedColor extends AnimatedValue {
   constructor (defaultValue) {
@@ -9,7 +14,8 @@ module.exports = class AnimatedColor extends AnimatedValue {
     this.interpolator = AnimatedColor.interpolator
   }
 
-  static interpolator (currentTime, keys, defaultValue) {
+  static interpolator (currentTime, keys, defaultValue, deltaTime,
+      interpolatorSettings) {
     // find closest keys before and after current time
     let closestLeft = -Infinity
     let closestRight = Infinity
@@ -23,32 +29,49 @@ module.exports = class AnimatedColor extends AnimatedValue {
     let right = AnimatedValue.resolveKey(keys, closestRight, defaultValue)
 
     // parse colors with failsafe
-    let leftColor = left ? (color(left[0]) || color([0, 0, 0, 0])) : null
-    let rightColor = right ? (color(right[0]) || color([0, 0, 0, 0])) : null
+    let leftColor = black
+    let rightColor = black
+    try {
+      leftColor = color(left[0])
+    } catch (err) {}
+    try {
+      rightColor = color(right[0])
+    } catch (err) {}
 
     // return default value if no keys are available
     if (!Number.isFinite(closestLeft) && !Number.isFinite(closestRight)) {
       return defaultValue
     }
     // return the right key's value if there are none on the left
-    if (!Number.isFinite(closestLeft)) return rightColor.toRgbString()
+    if (!Number.isFinite(closestLeft)) return rightColor.rgb().string()
     // return the left key's value if there are none on the right
-    if (!Number.isFinite(closestRight)) return leftColor.toRgbString()
+    if (!Number.isFinite(closestRight)) return leftColor.rgb().string()
+
+    let model = 'rgb'
+    if (validModels.includes(interpolatorSettings.model)) {
+      model = interpolatorSettings.model
+    }
 
     // interpolate value
-    let leftArray = leftColor.toRgbaArray() || [0, 0, 0, 0]
-    let rightArray = rightColor.toRgbaArray() || [0, 0, 0, 0]
+    let leftArray = leftColor[model]().array()
+    let rightArray = rightColor[model]().array()
 
     let intervalTime = (currentTime - closestLeft) / (closestRight -
       closestLeft)
     let easingValue = (right[1].function || Easing.linear)(intervalTime,
       ...(right[1].parameters || []))
 
-    let result = [0, 0, 0, 0]
+    // make sure alpha exists if necessary
+    let result = (rightColor.alpha() < leftColor.alpha())
+      ? rightColor[model]().array()
+      : leftColor[model]().array()
+
     for (let i in result) {
-      result[i] = (rightArray[i] - leftArray[i]) * easingValue + leftArray[i]
+      let l = leftArray[i] || 1
+      let r = rightArray[i] || 1
+      result[i] = (r - l) * easingValue + l
     }
 
-    return color(result).toRgbString()
+    return color(result, model).rgb().string()
   }
 }
