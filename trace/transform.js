@@ -11,11 +11,20 @@ module.exports = class Transform {
     this.rotateZ = new AnimatedNumber(0)
     this.skewX = new AnimatedNumber(0)
     this.skewY = new AnimatedNumber(0)
-    this.skewZ = new AnimatedNumber(0)
+    this.skewZX = new AnimatedNumber(0)
+    this.skewZY = new AnimatedNumber(0)
+    this.skewXZ = new AnimatedNumber(0)
+    this.skewYZ = new AnimatedNumber(0)
     this.scaleX = new AnimatedNumber(1)
     this.scaleY = new AnimatedNumber(1)
     this.scaleZ = new AnimatedNumber(1)
   }
+
+  // aliases
+  get skewXY () { return this.skewX }
+  set skewXY (v) { this.skewX = v }
+  get skewYX () { return this.skewY }
+  set skewYX (v) { this.skewY = v }
 
   getMatrix (currentTime, deltaTime) {
     let matrix = glMatrix.mat4.create()
@@ -28,7 +37,10 @@ module.exports = class Transform {
     const rotateZ = this.rotateZ.getValue(currentTime, deltaTime)
     const skewX = this.skewX.getValue(currentTime, deltaTime)
     const skewY = this.skewY.getValue(currentTime, deltaTime)
-    const skewZ = this.skewZ.getValue(currentTime, deltaTime)
+    const skewZX = this.skewZX.getValue(currentTime, deltaTime)
+    const skewZY = this.skewZY.getValue(currentTime, deltaTime)
+    const skewXZ = this.skewXZ.getValue(currentTime, deltaTime)
+    const skewYZ = this.skewYZ.getValue(currentTime, deltaTime)
     const scaleX = this.scaleX.getValue(currentTime, deltaTime)
     const scaleY = this.scaleY.getValue(currentTime, deltaTime)
     const scaleZ = this.scaleZ.getValue(currentTime, deltaTime)
@@ -39,16 +51,19 @@ module.exports = class Transform {
     glMatrix.mat4.rotate(matrix, matrix, rotateZ, [0, 0, 1])
     glMatrix.mat4.scale(matrix, matrix, [scaleX, scaleY, scaleZ])
 
-    // const skewMatrix = glMatrix.mat3.fromValues(1, skewY, 0, skewX, 1, 0, 0, 0, 1)
+    // skewX: skewX as it works in 2D (technically skewXY)
+    // skewY: skewY as it works in 2D (technically skewYX)
+    // skewZX: skew along Z axis in positive X
+    // skewZY: skew along Z axis in positive Y
+    // skewXZ: skew along X axis in positive Z
+    // skewYZ: skew along Y axis in positive Z
 
-    // <dark-magic>
     const skewMatrix = glMatrix.mat4.fromValues(
-      1, skewY, skewZ, 0,
-      skewX, 1, skewZ, 0,
-      skewX, skewY, 1, 0,
+      1, skewY, skewZX, 0,
+      skewX, 1, skewZY, 0,
+      skewXZ, skewYZ, 1, 0,
       0, 0, 0, 1
     )
-    // </dark-magic>
 
     glMatrix.mat4.multiply(matrix, matrix, skewMatrix)
 
