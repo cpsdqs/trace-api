@@ -3,7 +3,7 @@ const Trace = window.Trace
 const createContext = function (title, duration) {
   const container = document.createElement('div')
   container.className = 'container'
-  container.innerHTML = `<div class="title">${title}</div>`
+  container.innerHTML = `<div class="title">${title} (click to start)</div>`
   const canvas = document.createElement('canvas')
   container.appendChild(canvas)
   document.body.appendChild(container)
@@ -28,8 +28,6 @@ const createContext = function (title, duration) {
       container.querySelector('.title').textContent = title
     }
   })
-  timeline.run()
-  timeline.play()
   viewport.canvasWidth = 480
   viewport.canvasHeight = 360
   viewport.width = 480
@@ -200,7 +198,7 @@ const createContext = function (title, duration) {
   let rainbow = new ColorSquare()
   rainbow.addKeys({
     transform: { translateX: 60 },
-    color: { 0: '#f00', 3: '#f01'}
+    color: { 0: '#f00', 3: '#f01' }
   })
   rainbow.color.interpolatorSettings = { model: 'hsl' }
   let newCycle = function (x, model) {
@@ -231,4 +229,98 @@ const createContext = function (title, duration) {
   newCycle(180, 'ansi256')
   newCycle(200, 'hcg')
   newCycle(220, 'apple')
+}
+{
+  const viewport = createContext('Subcontext Test', 4)
+  class FPSMeter extends Trace.Object {
+    drawSelf (ctx, transform, currentTime, deltaTime) {
+      Trace.Utils.setTransformMatrix(ctx, transform)
+      ctx.fillStyle = '#000'
+      ctx.textBaseline = 'top'
+      ctx.textAlign = 'left'
+      ctx.font = '24px monospace'
+      let fps = Math.round(1 / deltaTime).toString()
+      fps = ' '.repeat(Math.max(0, 3 - fps.length)) + fps
+      ctx.fillText(fps + 'fps', 0, 0)
+    }
+  }
+  viewport.addChild(new FPSMeter())
+  const subcontext = new Trace.Subcontext(200, 200)
+  viewport.addChild(subcontext)
+  subcontext.filter = function (ctx, _, currentTime) {
+    ctx.resetTransform()
+    let id = ctx.getImageData(0, 0, subcontext.width, subcontext.height)
+    let d = id.data
+    if (currentTime < 1) {
+      for (let i = 0; i < d.length; i += 4) {
+        d[i] = 255 - d[i]
+        d[i + 1] = 255 - d[i + 1]
+        d[i + 2] = 255 - d[i + 2]
+      }
+    } else if (currentTime < 2) {
+      for (let i = 0; i < d.length; i += 4) {
+        d[i] = d[i + 1]
+        d[i + 1] = 255 * Math.cos(Math.PI * currentTime - Math.PI)
+        d[i + 2] = 255 * Math.sin(Math.PI * currentTime - Math.PI)
+      }
+    } else {
+      // extremely laggy “particle” effect
+      let w = subcontext.width * 4
+      let t = (currentTime - 2) * 50
+      let o = new Uint8ClampedArray(d.length)
+      // lines will “leak,” but wontfix as this is just a demo
+      let getPixel = (x, y) => [d[w * y + 4 * x], d[w * y + 4 * x + 1],
+        d[w * y + 4 * x + 2], d[w * y + 4 * x + 3]]
+      let setPixel = (x, y, r, g, b, a) => {
+        o[w * y + 4 * x] = r
+        o[w * y + 4 * x + 1] = g
+        o[w * y + 4 * x + 2] = b
+        o[w * y + 4 * x + 3] = a
+      }
+      let fn = (x, y) => [x + t * Math.random(), y + t * Math.random()]
+      let pixel, pos
+      for (let y = 0; y < subcontext.height; y++) {
+        for (let x = 0; x < subcontext.width; x++) {
+          pos = fn(x, y)
+          pixel = getPixel(Math.floor(pos[0]), Math.floor(pos[1]))
+          setPixel(x, y, ...pixel)
+        }
+      }
+      // won't accept setting directly for some reason
+      for (let i in o) d[i] = o[i]
+    }
+    ctx.putImageData(id, 0, 0)
+  }
+  subcontext.addKeys({
+    transform: {
+      translateX: 100,
+      translateY: 100
+    }
+  })
+  const obj = new Trace.Object()
+  subcontext.addChild(obj)
+  obj.addKeys({
+    transform: {
+      translateX: {
+        0: 0,
+        1: [100, Trace.Easing.easeOutExpo],
+        2: [150, Trace.Easing.easeInOutExpo],
+        3: [100, Trace.Easing.easeInOutExpo]
+      },
+      translateY: 100,
+      scaleX: 2,
+      scaleY: 2
+    }
+  })
+  const text = new Trace.ClippedText()
+  subcontext.addChild(text)
+  text.addKeys({
+    text: 'Hello world!',
+    color: '#0af',
+    transform: {
+      translateX: 10,
+      translateY: 30
+    },
+    align: 'left'
+  })
 }

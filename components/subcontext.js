@@ -5,20 +5,26 @@ let ImageConstructor
 let loadCanvas = function () {
   if (typeof window !== 'undefined') {
     if (typeof window.OffscreenCanvas !== 'undefined') {
-      CanvasConstructor = window.OffscreenCanvas
+      // CanvasConstructor = window.OffscreenCanvas doesn't support text
+      CanvasConstructor = (w, h) => {
+        let canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        return canvas
+      }
       ImageConstructor = window.Image
     } else {
       throw new Error('No OffscreenCanvas in window')
     }
   } else {
-    let nodeCanvas
+    let NodeCanvas
     try {
-      nodeCanvas = require('canvas')
+      NodeCanvas = require('canvas')
     } catch (err) {
       throw new Error('No canvas module')
     }
-    CanvasConstructor = nodeCanvas
-    ImageConstructor = nodeCanvas.Image
+    CanvasConstructor = (...args) => new NodeCanvas(...args)
+    ImageConstructor = NodeCanvas.Image
   }
 }
 
@@ -44,11 +50,13 @@ module.exports = class Subcontext extends Trace.Object {
     this.subctx = {}
     this.buffer = new ImageConstructor(0, 0)
 
+    this.filter = function () {}
+
     this.updateCanvas()
   }
   updateCanvas () {
     if (this.canvas.width !== this.width || this.canvas.height !== this.height) {
-      this.canvas = new CanvasConstructor(this.width, this.height)
+      this.canvas = CanvasConstructor(this.width, this.height)
       this.subctx = this.canvas.getContext('2d')
     }
   }
@@ -69,6 +77,8 @@ module.exports = class Subcontext extends Trace.Object {
         node.draw(this.subctx, subTransform, currentTime, deltaTime)
       }
     }
+
+    this.filter(this.subctx, subTransform, currentTime, deltaTime)
 
     if (this.buffer.width !== this.width && this.buffer.height !== this.height) {
       this.buffer = new ImageConstructor(this.width, this.height)
