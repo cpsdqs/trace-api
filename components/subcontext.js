@@ -4,18 +4,18 @@ let CanvasConstructor
 let ImageConstructor
 let loadCanvas = function () {
   if (typeof window !== 'undefined') {
-    if (typeof window.OffscreenCanvas !== 'undefined') {
+    // if (typeof window.OffscreenCanvas !== 'undefined') {
       // CanvasConstructor = window.OffscreenCanvas doesn't support text
-      CanvasConstructor = (w, h) => {
-        let canvas = document.createElement('canvas')
-        canvas.width = w
-        canvas.height = h
-        return canvas
-      }
-      ImageConstructor = window.Image
-    } else {
-      throw new Error('No OffscreenCanvas in window')
+    CanvasConstructor = (w, h) => {
+      let canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      return canvas
     }
+    ImageConstructor = window.Image
+    // } else {
+      // throw new Error('No OffscreenCanvas in window')
+    // }
   } else {
     let NodeCanvas
     try {
