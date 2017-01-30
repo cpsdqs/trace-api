@@ -20,15 +20,13 @@ let loadCanvas = function () {
     CanvasConstructor = nodeCanvas
     ImageConstructor = nodeCanvas.Image
   }
-  return CanvasConstructor
 }
 
 module.exports = class Subcontext extends Trace.Object {
   constructor (width, height) {
     super()
 
-    this.CanvasConstructor = CanvasConstructor
-    if (!CanvasConstructor) this.CanvasConstructor = loadCanvas()
+    if (!CanvasConstructor) loadCanvas()
 
     this.width = width
     this.height = height
@@ -50,28 +48,35 @@ module.exports = class Subcontext extends Trace.Object {
   }
   updateCanvas () {
     if (this.canvas.width !== this.width || this.canvas.height !== this.height) {
-      this.canvas = new this.CanvasConstructor(this.width, this.height)
+      this.canvas = new CanvasConstructor(this.width, this.height)
       this.subctx = this.canvas.getContext('2d')
     }
   }
-  drawChildren (ctx, transform, currentTime, deltaTime) {
+  drawSubcontext (ctx, transform, currentTime, deltaTime) {
     let {values, children} = this.sortChildren(currentTime, deltaTime)
 
     let dx = this.originX.getValue(currentTime, deltaTime)
     let dy = this.originY.getValue(currentTime, deltaTime)
     let subTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, dx, dy, 0, 1]
     if (this.subTransform) subTransform = this.subTransform.getMatrix()
-    let subctx = this.subctx
 
     this.subctx.setTransform(1, 0, 0, 1, 0, 0)
     this.subctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
     for (let node of children) {
       if (values.get(node)[1] === true) {
-        Trace.Utils.resetCtx(subctx)
-        node.draw(subctx, subTransform, currentTime, deltaTime)
+        Trace.Utils.resetCtx(this.subctx)
+        node.draw(this.subctx, subTransform, currentTime, deltaTime)
       }
     }
+
+    if (this.buffer.width !== this.width && this.buffer.height !== this.height) {
+      this.buffer = new ImageConstructor(this.width, this.height)
+    }
+    this.buffer.src = this.canvas.toDataURL()
+  }
+  drawChildren (ctx, transform, currentTime, deltaTime) {
+    this.drawSubcontext(ctx, transform, currentTime, deltaTime)
   }
   drawSelf (ctx, transform, currentTime, deltaTime) {
     Trace.Utils.setTransformMatrix(ctx, transform)
