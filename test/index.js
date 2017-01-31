@@ -249,7 +249,7 @@ const createContext = function (title, duration) {
   viewport.addChild(subcontext)
   subcontext.filter = function (ctx, _, currentTime) {
     ctx.resetTransform()
-    let id = ctx.getImageData(0, 0, subcontext.width, subcontext.height)
+    let id = ctx.getImageData(0, 0, subcontext.realWidth, subcontext.realHeight)
     let d = id.data
     if (currentTime < 1) {
       for (let i = 0; i < d.length; i += 4) {
@@ -265,7 +265,7 @@ const createContext = function (title, duration) {
       }
     } else {
       // extremely laggy “particle” effect
-      let w = subcontext.width * 4
+      let w = subcontext.realWidth * 4
       let t = (currentTime - 2) * 50
       let o = new Uint8ClampedArray(d.length)
       // lines will “leak,” but wontfix as this is just a demo
@@ -279,8 +279,8 @@ const createContext = function (title, duration) {
       }
       let fn = (x, y) => [x + t * Math.random(), y + t * Math.random()]
       let pixel, pos
-      for (let y = 0; y < subcontext.height; y++) {
-        for (let x = 0; x < subcontext.width; x++) {
+      for (let y = 0; y < subcontext.realHeight; y++) {
+        for (let x = 0; x < subcontext.realWidth; x++) {
           pos = fn(x, y)
           pixel = getPixel(Math.floor(pos[0]), Math.floor(pos[1]))
           setPixel(x, y, ...pixel)

@@ -43,6 +43,12 @@ module.exports = class Subcontext extends Trace.Object {
     // or just use something that implements getMatrix() -> Array(16)
     this.subTransform = null
 
+    // whether or not to scale the canvas according to the parent's scale
+    // such that pixels map one on one again
+    this.inheritScale = true
+    this.scaleX = 1
+    this.scaleY = 1
+
     // origin when drawing this object
     this.anchorX = new Trace.AnimatedNumber(0)
     this.anchorY = new Trace.AnimatedNumber(0)
@@ -54,19 +60,40 @@ module.exports = class Subcontext extends Trace.Object {
 
     this.updateCanvas()
   }
+  get realWidth () {
+    return this.width * this.scaleX
+  }
+  get realHeight () {
+    return this.height * this.scaleY
+  }
+  set realWidth (v) {
+    this.width = v / this.scaleX
+  }
+  set realHeight (v) {
+    this.height = v / this.scaleY
+  }
   updateCanvas () {
-    if (this.canvas.width !== this.width || this.canvas.height !== this.height) {
-      this.canvas = CanvasConstructor(this.width, this.height)
+    let w = this.realWidth
+    let h = this.realHeight
+    if (this.canvas.width !== w || this.canvas.height !== h) {
+      this.canvas = CanvasConstructor(w, h)
       this.subctx = this.canvas.getContext('2d')
+    }
+    if (this.buffer.width !== w && this.buffer.height !== h) {
+      this.buffer = new ImageConstructor(w, h)
     }
   }
   drawSubcontext (ctx, transform, currentTime, deltaTime) {
     let {values, children} = this.sortChildren(currentTime, deltaTime)
 
+    let sx = this.inheritScale ? (this.scaleX = transform[0]) : 1
+    let sy = this.inheritScale ? (this.scaleY = transform[5]) : 1
     let dx = this.originX.getValue(currentTime, deltaTime)
     let dy = this.originY.getValue(currentTime, deltaTime)
-    let subTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, dx, dy, 0, 1]
+    let subTransform = [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, 1, 0, dx, dy, 0, 1]
     if (this.subTransform) subTransform = this.subTransform.getMatrix()
+
+    this.updateCanvas()
 
     this.subctx.setTransform(1, 0, 0, 1, 0, 0)
     this.subctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -80,9 +107,6 @@ module.exports = class Subcontext extends Trace.Object {
 
     this.filter(this.subctx, subTransform, currentTime, deltaTime)
 
-    if (this.buffer.width !== this.width && this.buffer.height !== this.height) {
-      this.buffer = new ImageConstructor(this.width, this.height)
-    }
     this.buffer.src = this.canvas.toDataURL()
   }
   drawChildren (ctx, transform, currentTime, deltaTime) {
@@ -95,6 +119,7 @@ module.exports = class Subcontext extends Trace.Object {
       -this.anchorX.getValue(currentTime, deltaTime),
       -this.anchorY.getValue(currentTime, deltaTime)
     )
+    ctx.scale(1 / this.scaleX, 1 / this.scaleY)
 
     ctx.drawImage(this.buffer, 0, 0)
   }

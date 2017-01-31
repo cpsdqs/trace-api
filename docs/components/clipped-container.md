@@ -1,4 +1,5 @@
 # ClippedContainer
+**extends [`Object`](../api/object.md)**
 
 Draws its children inside a clipping mask.
 

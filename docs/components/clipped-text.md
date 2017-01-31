@@ -1,4 +1,6 @@
 # ClippedText
+**extends [`Object`](../api/object.md)**
+
 Displays text.
 
 ## Properties
