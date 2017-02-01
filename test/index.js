@@ -264,30 +264,28 @@ const createContext = function (title, duration) {
         d[i + 2] = 255 * Math.sin(Math.PI * currentTime - Math.PI)
       }
     } else {
-      // extremely laggy “particle” effect
       let w = subcontext.realWidth * 4
-      let t = (currentTime - 2) * 50
-      let o = new Uint8ClampedArray(d.length)
-      // lines will “leak,” but wontfix as this is just a demo
-      let getPixel = (x, y) => [d[w * y + 4 * x], d[w * y + 4 * x + 1],
-        d[w * y + 4 * x + 2], d[w * y + 4 * x + 3]]
-      let setPixel = (x, y, r, g, b, a) => {
-        o[w * y + 4 * x] = r
-        o[w * y + 4 * x + 1] = g
-        o[w * y + 4 * x + 2] = b
-        o[w * y + 4 * x + 3] = a
-      }
-      let fn = (x, y) => [x + t * Math.random(), y + t * Math.random()]
-      let pixel, pos
-      for (let y = 0; y < subcontext.realHeight; y++) {
-        for (let x = 0; x < subcontext.realWidth; x++) {
-          pos = fn(x, y)
-          pixel = getPixel(Math.floor(pos[0]), Math.floor(pos[1]))
-          setPixel(x, y, ...pixel)
+      let y = 0
+      let realHeight = subcontext.realHeight
+      let scaleX = subcontext.scaleX
+      let scaleY = subcontext.scaleY
+      let shiftr, shiftg, shiftb, shifta, height
+      while (y < realHeight) {
+        shiftr = Math.floor(10 * (2 * Math.random() - 1) * scaleX)
+        shiftg = Math.floor(10 * (2 * Math.random() - 1) * scaleX)
+        shiftb = Math.floor(10 * (2 * Math.random() - 1) * scaleX)
+        shifta = Math.floor(10 * (2 * Math.random() - 1) * scaleX)
+        height = Math.floor(Math.random() * 40 * scaleY) + 1
+        for (let dy = 0; dy < height; dy++) {
+          for (let x = 0; x < w; x++) {
+            d[w * y + 4 * (x + shiftr) % w] = d[w * y + 4 * x]
+            d[w * y + 4 * (x + shiftg) % w + 1] = d[w * y + 4 * x + 1]
+            d[w * y + 4 * (x + shiftb) % w + 2] = d[w * y + 4 * x + 2]
+            d[w * y + 4 * (x + shifta) % w + 3] = d[w * y + 4 * x + 3]
+          }
+          y++
         }
       }
-      // won't accept setting directly for some reason
-      for (let i in o) d[i] = o[i]
     }
     ctx.putImageData(id, 0, 0)
   }
