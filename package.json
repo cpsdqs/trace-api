@@ -1,6 +1,6 @@
 {
   "name": "trace-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "cpsdqs",
   "description": "Canvas Animation Engine",
   "main": "index.js",
