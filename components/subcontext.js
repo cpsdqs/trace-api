@@ -49,6 +49,10 @@ module.exports = class Subcontext extends Trace.Object {
     this.scaleX = 1
     this.scaleY = 1
 
+    // will only draw when time changes if false
+    this.alwaysRedraw = true
+    this.__lastDrawTime = null
+
     // origin when drawing this object
     this.anchorX = new Trace.AnimatedNumber(0)
     this.anchorY = new Trace.AnimatedNumber(0)
@@ -110,7 +114,10 @@ module.exports = class Subcontext extends Trace.Object {
     this.buffer.src = this.canvas.toDataURL()
   }
   drawChildren (ctx, transform, currentTime, deltaTime) {
-    this.drawSubcontext(ctx, transform, currentTime, deltaTime)
+    if (this.alwaysRedraw || this.__lastDrawTime !== currentTime) {
+      this.drawSubcontext(ctx, transform, currentTime, deltaTime)
+      this.__lastDrawTime = currentTime
+    }
   }
   drawSelf (ctx, transform, currentTime, deltaTime) {
     Trace.Utils.setTransformMatrix(ctx, transform)
