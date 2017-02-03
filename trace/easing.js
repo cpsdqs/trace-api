@@ -1,5 +1,12 @@
 const BezierEasing = require('bezier-easing')
 
+let bezierCache = new Map()
+let getBezier = function (...args) {
+  let name = args.reduce((a, b) => `${a}:${b}`, '')
+  if (!bezierCache.has(name)) bezierCache.set(name, BezierEasing(...args))
+  return bezierCache.get(name)
+}
+
 module.exports = {
   linear (t) {
     return t
@@ -79,13 +86,13 @@ module.exports = {
 
   // from easings.net
   easeInBack (t) {
-    return BezierEasing(0.6, -0.28, 0.735, 0.045)(t)
+    return getBezier(0.6, -0.28, 0.735, 0.045)(t)
   },
   easeOutBack (t) {
-    return BezierEasing(0.175, 0.885, 0.32, 1.275)(t)
+    return getBezier(0.175, 0.885, 0.32, 1.275)(t)
   },
   easeInOutBack (t) {
-    return BezierEasing(0.68, -0.55, 0.265, 1.55)(t)
+    return getBezier(0.68, -0.55, 0.265, 1.55)(t)
   },
 
   step (t, start = false, count = 1) {
@@ -93,6 +100,6 @@ module.exports = {
   },
 
   cubicBezier (t, x1 = 0, y1 = 0, x2 = 1, y2 = 1) {
-    return BezierEasing(x1, y1, x2, y2)(t)
+    return getBezier(x1, y1, x2, y2)(t)
   }
 }

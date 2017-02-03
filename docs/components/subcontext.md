@@ -26,6 +26,11 @@ Will override originX and originY if not `null`. Should implement a `getMatrix()
 
 Whether or not the canvas size should be scaled such that pixels map one to one.
 
+### `alwaysRedraw`
+**Default**: `true`
+
+Whether or not the canvas should redraw every time, or only if the currentTime changes.
+
 ### `scaleX`, `scaleY`
 **Default**: `1`
 
