@@ -1,6 +1,7 @@
 const TraceObject = require('./object')
+const glMatrix = require('gl-matrix')
 
-let identityTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+let identityTransform = glMatrix.mat4.create()
 
 module.exports = class Timeline extends TraceObject {
   constructor (ctx) {
