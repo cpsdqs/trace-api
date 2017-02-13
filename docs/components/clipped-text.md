@@ -23,7 +23,7 @@ How much of the text to clip.
 ### `skew`
 **Default**: `AnimatedNumber(0)`
 
-How much to skew the clipping mask (in radians).
+How much to skewX the clipping mask (in radians).
 
 ### `family`
 **Default**: `AnimatedString('sans-serif')`

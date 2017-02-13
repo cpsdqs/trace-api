@@ -3,7 +3,7 @@
 
 Draws its children onto a canvas.
 
-This will use either `HTMLCanvasElement` or `canvas` as a fallback. (`OffscreenCanvas` doesn't support text)
+This will use either `HTMLCanvasElement` or [`canvas`](https://npmjs.com/package/canvas) as a fallback. (`OffscreenCanvas` doesn't support text)
 
 Constructor should have two arguments: width and height.
 

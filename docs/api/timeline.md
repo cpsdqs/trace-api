@@ -57,7 +57,7 @@ When the draw method was last called. (Result of `Date.now()`)
 ### `markers`
 **Default**: `new Map()`
 
-A `Map<time,value>`. If the value is `0`, the playback will stop when the marker is passed.
+A `Map<time, value>` specifying marker type at the specified time. If the value is `0`, the playback will stop when the marker is passed.
 
 ## Methods
 ### `play()`
@@ -81,7 +81,7 @@ Returns true if state was changed.
 Stops the draw loop.
 
 ### `drawLoop()`
-Recursive draw loop.
+Recursive draw loop. Should not be called directly.
 
 ### `drawCurrent(dt)`
 - `dt` Number - Value to be passed for delta time (Default: `0`)

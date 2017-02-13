@@ -4,7 +4,7 @@ Auxiliary things.
 ## Static Methods
 ### `setTransformMatrix(ctx, matrix)`
 - `ctx` CanvasRenderingContext2D
-- `matrix` Matrix3
+- `matrix` Matrix4
 
 Sets the canvas' transformation to the specified matrix.
 

@@ -7,24 +7,24 @@ A basic object.
 An `Object` instance has the following properties:
 
 ### `transform`
-**Default**: 3x3 identity matrix
+**Default**: `new Transform()`
 
-A [`Transform`](transform.md) instance.
+The object's transform.
 
 ### `opacity`
-**Default**: `1`
+**Default**: `AnimatedNumber(1)`
 
-An [`AnimatedNumber`](animated-number.md) instance.
+The object's opacity.
 
 ### `enabled`
-**Default**: `true`
+**Default**: `AnimatedBoolean(true)`
 
-An [`AnimatedBoolean`](animated-boolean.md) instance. This object will be skipped by `drawChildren` if false.
+This object will be skipped by `drawChildren` if this is set to false.
 
 ### `parentNode`
 **Default**: `null`
 
-An `Object` or `null`. This variable should not be set manually.
+The parent node. An `Object` instance or `null`. This variable should not be set manually.
 
 ### `children`
 **Default**: `new Set()`
@@ -34,7 +34,7 @@ Child nodes of this object.
 ## Methods
 ### `draw(ctx, parentTransform, currentTime, deltaTime)`
 - `ctx` CanvasRenderingContext2D
-- `parentTransform` Matrix3
+- `parentTransform` Matrix4
 - `currentTime` Number
 - `deltaTime` Number
 
@@ -42,13 +42,13 @@ Draws itself and its children.
 
 ### `drawSelf(ctx, transform, currentTime, deltaTime)`
 - `ctx` CanvasRenderingContext2D
-- `transform` Matrix3
+- `transform` Matrix4
 - `currentTime` Number
 - `deltaTime` Number
 
 ### `drawChildren(ctx, transform, currentTime, deltaTime)`
 - `ctx` CanvasRenderingContext2D
-- `transform` Matrix3 - The matrix the child nodes will receive as `parentTransform`
+- `transform` Matrix4 - The matrix the child nodes will receive as `parentTransform`
 - `currentTime` Number
 - `deltaTime` Number
 
