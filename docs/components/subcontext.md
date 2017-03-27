@@ -3,9 +3,7 @@
 
 Draws its children onto a canvas.
 
-This will use either `HTMLCanvasElement` or [`canvas`](https://npmjs.com/package/canvas) as a fallback. (`OffscreenCanvas` doesn't support text)
-
-Constructor should have two arguments: width and height.
+The constructor should have two arguments: `width` and `height`. Optionally, it can have `canvas` and `image` for use as a canvas for drawing and image buffer, respectively. By default, this will use `document.createElement('canvas')` and `window.Image`.
 
 ## Properties
 ### `width`, `height`

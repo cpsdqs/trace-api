@@ -25,9 +25,6 @@
     "standard": "^8.6.0",
     "webpack": "^1.14.0"
   },
-  "optionalDependencies": {
-    "canvas": "^1.6.3"
-  },
   "scripts": {
     "webpack": "./node_modules/.bin/webpack",
     "test": "./node_modules/.bin/coffee -cb -o spec-compiled spec && ./node_modules/.bin/jasmine"

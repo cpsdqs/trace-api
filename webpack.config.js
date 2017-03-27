@@ -6,12 +6,6 @@ if (process.env.small) {
   ignores.push('\\.\\/components')
   console.log('Building without extra components (env: small)')
 }
-try {
-  require('canvas')
-} catch (err) {
-  // canvas doesn't exist -- ignore it
-  ignores.push('canvas')
-}
 let ignore = new RegExp(`^(${ignores.reduce((a, b) => `${a}|${b}`, '')})$`)
 
 module.exports = {

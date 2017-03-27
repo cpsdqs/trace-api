@@ -116,8 +116,4 @@ module.exports = class Timeline extends TraceObject {
       return true
     } else return false
   }
-
-  drawSelf (ctx, transform, currentTime, deltaTime) {
-    return
-  }
 }

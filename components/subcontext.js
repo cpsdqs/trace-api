@@ -1,43 +1,12 @@
 const Trace = require('../trace')
 
-// TODO: allow specifying canvas constructor
-
-let CanvasConstructor
-let ImageConstructor
-let loadCanvas = function () {
-  if (typeof window !== 'undefined') {
-    // if (typeof window.OffscreenCanvas !== 'undefined') {
-      // CanvasConstructor = window.OffscreenCanvas doesn't support text
-    CanvasConstructor = (w, h) => {
-      let canvas = document.createElement('canvas')
-      canvas.width = w
-      canvas.height = h
-      return canvas
-    }
-    ImageConstructor = window.Image
-    // } else {
-      // throw new Error('No OffscreenCanvas in window')
-    // }
-  } else {
-    let NodeCanvas
-    try {
-      NodeCanvas = require('canvas')
-    } catch (err) {
-      throw new Error('No canvas module')
-    }
-    CanvasConstructor = (...args) => new NodeCanvas(...args)
-    ImageConstructor = NodeCanvas.Image
-  }
-}
-
 module.exports = class Subcontext extends Trace.Object {
-  constructor (width, height) {
+  constructor (width, height, canvas, image) {
     super()
-
-    if (!CanvasConstructor) loadCanvas()
 
     this.width = width
     this.height = height
+
     // origin when drawing to the context
     this.originX = new Trace.AnimatedNumber(0)
     this.originY = new Trace.AnimatedNumber(0)
@@ -58,9 +27,9 @@ module.exports = class Subcontext extends Trace.Object {
     // origin when drawing this object
     this.anchorX = new Trace.AnimatedNumber(0)
     this.anchorY = new Trace.AnimatedNumber(0)
-    this.canvas = { width: -Infinity, height: -Infinity }
-    this.subctx = {}
-    this.buffer = new ImageConstructor(0, 0)
+    this.canvas = canvas || document.createElement('canvas')
+    this.subctx = this.canvas.getContext('2d')
+    this.buffer = image || new window.Image()
 
     this.filter = function () {}
 
@@ -82,11 +51,12 @@ module.exports = class Subcontext extends Trace.Object {
     let w = this.realWidth
     let h = this.realHeight
     if (this.canvas.width !== w || this.canvas.height !== h) {
-      this.canvas = CanvasConstructor(w, h)
-      this.subctx = this.canvas.getContext('2d')
+      this.canvas.width = w
+      this.canvas.height = h
     }
     if (this.buffer.width !== w && this.buffer.height !== h) {
-      this.buffer = new ImageConstructor(w, h)
+      this.buffer.width = w
+      this.buffer.height = h
     }
   }
   drawSubcontext (ctx, transform, currentTime, deltaTime) {
