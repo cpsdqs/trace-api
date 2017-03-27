@@ -42,7 +42,7 @@ const topCanvas = document.querySelector('#top-canvas')
 
   {
     let family = "'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, Roboto, sans-serif"
-    let mono = "'Operator Mono', Menlo, Monaco, Inconsolata, Consolas, 'Lucida Console', monospace"
+    let mono = "Inconsolata, Menlo, Monaco, Inconsolata, Consolas, 'Lucida Console', monospace"
 
     let circle = new Circle()
     viewport.addChild(circle)

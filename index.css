@@ -84,7 +84,7 @@ body.white {
   box-shadow: none;
 }
 #content pre.language-js code.language-js {
-  font-family: 'Operator Mono', Menlo, Monaco, Inconsolata, Consolas, 'Lucida Console', monospace;
+  font-family: Inconsolata, Menlo, Monaco, Inconsolata, Consolas, 'Lucida Console', monospace;
 }
 
 #example-output {
