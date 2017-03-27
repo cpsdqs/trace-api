@@ -8,6 +8,15 @@ if (process.env.small) {
 }
 let ignore = new RegExp(`^(${ignores.reduce((a, b) => `${a}|${b}`, '')})$`)
 
+let packageInfo = require('./package.json')
+
+// hardcoded GitHub URL below
+let licenseHeader = `
+${packageInfo.name} ${packageInfo.version}
+${packageInfo.license} (c) ${new Date().getUTCFullYear()} ${packageInfo.author}
+https://github.com/${packageInfo.repository}
+`.split('\n').filter(x => x).join(' | ')
+
 module.exports = {
   entry: path.resolve('.', 'index.js'),
   output: {
@@ -22,6 +31,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.BannerPlugin(licenseHeader),
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.IgnorePlugin(ignore),
     // webpack breaks gl-matrix for some reason
