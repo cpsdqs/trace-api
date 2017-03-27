@@ -1,7 +1,9 @@
 # Object
+**extends [`EventEmitter`](https://nodejs.org/api/events.html)**
+
 _Not the Javascript `Object`_
 
-A basic object.
+A basic object. This doesn't do anything by itself and can be used as a container object.
 
 ## Properties
 An `Object` instance has the following properties:
@@ -46,6 +48,8 @@ Draws itself and its children.
 - `currentTime` Number
 - `deltaTime` Number
 
+Draws itself.
+
 ### `drawChildren(ctx, transform, currentTime, deltaTime)`
 - `ctx` CanvasRenderingContext2D
 - `transform` Matrix4 - The matrix the child nodes will receive as `parentTransform`
@@ -54,15 +58,15 @@ Draws itself and its children.
 
 Sorts children by zIndex and draws them.
 
-### `addChild(childNode)`
+### `addChild(childNode, ...)`
 - `childNode` Object
 
-Adds a child node.
+Adds child nodes. Throws if the child node already has a parent.
 
-### `removeChild(childNode)`
+### `removeChild(childNode, ...)`
 - `childNode` Object
 
-Removes a child node, if present.
+Removes child nodes, if present. Throws if the node was never a child node.
 
 ### `hasChild(childNode)`
 - `childNode` Object

@@ -1,15 +1,30 @@
-let defaultInterpolator = function (_1, _2, defaultValue) { return defaultValue }
+const EventEmitter = require('events')
 
-class AnimatedValue {
+class AnimatedValue extends EventEmitter {
   constructor (defaultValue) {
+    super()
+
     this.defaultValue = defaultValue
     this.keys = new Map()
-    this.interpolator = defaultInterpolator
+    this.interpolator = AnimatedValue.interpolator
     this.interpolatorSettings = {}
+    this.lastValue = null
   }
 
   getValue (currentTime, deltaTime) {
-    return AnimatedValue.applyInterpolator(this, currentTime, deltaTime)
+    let value = AnimatedValue.applyInterpolator(this, currentTime, deltaTime)
+
+    // emit `change` if the value changed
+    if (this.valuesAreEqual(value, this.lastValue)) {
+      this.lastValue = value
+      this.emit('change', value)
+    }
+
+    return value
+  }
+
+  valuesAreEqual (a, b) {
+    return a === b
   }
 
   addKey (time, value, easing, parameters) {
@@ -22,6 +37,29 @@ class AnimatedValue {
     this.keys.delete(time)
   }
 
+  static interpolator ({ currentTime, keys, defaultValue, deltaTime, settings }) {
+    // find closest keys before and after current time
+    let closestLeft = -Infinity
+    let closestRight = Infinity
+
+    for (let time of keys.keys()) {
+      if (time <= currentTime && time > closestLeft) closestLeft = time
+      if (time > currentTime && time < closestRight) closestRight = time
+    }
+
+    // return default value if no keys are available
+    if (!Number.isFinite(closestLeft) && !Number.isFinite(closestRight)) {
+      return defaultValue
+    }
+
+    // return right key's value if there are none on the left
+    if (!Number.isFinite(closestLeft)) {
+      return AnimatedValue.resolveKey(keys, closestRight, defaultValue)[0]
+    }
+    // return the left key's value
+    return AnimatedValue.resolveKey(keys, closestLeft, defaultValue)[0]
+  }
+
   static resolveKey (keys, time, defaultValue) {
     if (keys.get(time) && keys.get(time)[0] === AnimatedValue.PREV_KEY) {
       let keyTime = -Infinity
@@ -32,14 +70,27 @@ class AnimatedValue {
           key = keys.get(t)
         }
       }
-      if (!key) return defaultValue
+      if (!key) {
+        return [
+          defaultValue,
+          {
+            function: undefined,
+            parameters: undefined
+          }
+        ]
+      }
       return key
     } else return keys.get(time)
   }
 
   static applyInterpolator (instance, currentTime, deltaTime) {
-    return instance.interpolator(currentTime, instance.keys,
-      instance.defaultValue, deltaTime, instance.interpolatorSettings)
+    return instance.interpolator({
+      currentTime,
+      keys: instance.keys,
+      defaultValue: instance.defaultValue,
+      deltaTime,
+      settings: instance.interpolatorSettings
+    })
   }
 }
 AnimatedValue.PREV_KEY = Symbol('Previous Key')

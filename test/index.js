@@ -1,5 +1,30 @@
 const Trace = window.Trace
 
+class ExampleObject extends Trace.Object {
+  drawSelf (ctx, transform, currentTime, deltaTime) {
+    Trace.Utils.setTransformMatrix(ctx, transform)
+    ctx.fillStyle = '#fff'
+    ctx.strokeStyle = '#637bc5'
+    ctx.font = '10px Operator Mono, Menlo, Monaco, Inconsolata, Consolas, ' +
+      'Lucida Console, monospace'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.globalAlpha = this.opacity.getValue(currentTime, deltaTime)
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.lineWidth = 2
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.lineDashOffset = 0
+    ctx.setLineDash([])
+    ctx.strokeText('[Object]', 0, 0)
+    ctx.fillText('[Object]', 0, 0)
+    ctx.fillStyle = '#4ebc6b'
+    ctx.beginPath()
+    ctx.arc(0, 0, 1, 0, 2 * Math.PI)
+    ctx.fill()
+  }
+}
+
 const createContext = function (title, duration) {
   const container = document.createElement('div')
   container.className = 'container'
@@ -38,23 +63,23 @@ const createContext = function (title, duration) {
 
 {
   const viewport = createContext('Object Transform Test', 6)
-  const object = new Trace.Object()
+  const object = new ExampleObject()
   viewport.addChild(object)
   object.addKeys({
     transform: {
       translateX: { 0: 240, 1: 140 },
       translateY: 180,
-      scaleX: { 1: 1, '+1': 2 },
-      scaleY: { 1.5: 1, '+1': 2 },
-      rotateZ: { 3: 0, '+1': Math.PI },
-      skewX: { 4: 0, '+1': Math.PI },
-      skewY: { 5: 0, '+1': -Math.PI }
+      scaleX: { 1: 1, 2: 2 },
+      scaleY: { 1.5: 1, 2.5: 2 },
+      rotateZ: { 3: 0, 4: Math.PI },
+      skewX: { 4: 0, 5: Math.PI },
+      skewY: { 5: 0, 6: -Math.PI }
     }
   })
 }
 {
   const viewport = createContext('Object Opacity Test', 2)
-  const object = new Trace.Object()
+  const object = new ExampleObject()
   viewport.addChild(object)
   object.addKeys({
     transform: { translateX: 240, translateY: 180 },
@@ -63,7 +88,7 @@ const createContext = function (title, duration) {
 }
 {
   const viewport = createContext('Spring Interpolator Test', 5)
-  const object = new Trace.Object()
+  const object = new ExampleObject()
   viewport.addChild(object)
   object.transform.translateX.interpolator = Trace.AnimatedNumber.springInterpolator
   object.transform.translateX.interpolatorSettings = { spring: [300, 20] }
@@ -143,7 +168,7 @@ const createContext = function (title, duration) {
   const viewport = createContext('ClippedContainer Test', 3)
   const cc = new Trace.ClippedContainer()
   viewport.addChild(cc)
-  const obj = new Trace.Object()
+  const obj = new ExampleObject()
   cc.addChild(obj)
   cc.transform.translateX.addKey(0, 240)
   cc.transform.translateY.addKey(0, 180)
@@ -295,7 +320,7 @@ const createContext = function (title, duration) {
       translateY: 100
     }
   })
-  const obj = new Trace.Object()
+  const obj = new ExampleObject()
   subcontext.addChild(obj)
   obj.addKeys({
     transform: {

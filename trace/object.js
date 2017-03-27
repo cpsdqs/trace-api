@@ -60,44 +60,29 @@ module.exports = class TraceObject extends EventEmitter {
     this.drawChildren(ctx, transform, currentTime, deltaTime)
   }
 
-  drawSelf (ctx, transform, currentTime, deltaTime) {
-    // placeholder -- subclasses should replace this with something else
-    Utils.setTransformMatrix(ctx, transform)
-    ctx.fillStyle = '#fff'
-    ctx.strokeStyle = '#637bc5'
-    ctx.font = '10px Operator Mono, Menlo, Monaco, Inconsolata, Consolas, ' +
-      'Lucida Console, monospace'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.globalAlpha = this.opacity.getValue(currentTime, deltaTime)
-    ctx.globalCompositeOperation = 'source-over'
-    ctx.lineWidth = 2
-    ctx.lineCap = 'round'
-    ctx.lineJoin = 'round'
-    ctx.lineDashOffset = 0
-    ctx.setLineDash([])
-    ctx.strokeText('[Object]', 0, 0)
-    ctx.fillText('[Object]', 0, 0)
-    ctx.fillStyle = '#4ebc6b'
-    ctx.beginPath()
-    ctx.arc(0, 0, 1, 0, 2 * Math.PI)
-    ctx.fill()
-  }
+  drawSelf (ctx, transform, currentTime, deltaTime) {}
 
-  addChild (childNode) {
-    if (childNode.parentNode !== null && childNode.parentNode !== this) {
-      throw new Error('Child node already has a parent')
+  addChild (...childNodes) {
+    for (let childNode of childNodes) {
+      if (childNode.parentNode !== null && childNode.parentNode !== this) {
+        throw new Error('Child node already has a parent')
+      }
+      this.children.add(childNode)
+      childNode.parentNode = this
+      childNode.emit('connected')
     }
-    /* if (!(childNode instanceof TraceObject)) {
-      throw new Error('Child node is not a Trace Object')
-    } */
-    this.children.add(childNode)
-    childNode.parentNode = this
-    childNode.emit('connected')
   }
-  removeChild (childNode) {
-    childNode.emit('disconnected')
-    return this.children.delete(childNode)
+  removeChild (...childNodes) {
+    let removed = []
+    for (let childNode of childNodes) {
+      if (childNode.parentNode !== this) {
+        throw new Error('Not a child node of this object')
+      }
+      childNode.emit('disconnected')
+      childNode.parentNode = null
+      removed.push(this.children.delete(childNode))
+    }
+    return removed.length === 1 ? removed[0] : removed
   }
   hasChild (childNode) {
     return this.children.has(childNode)
@@ -123,7 +108,6 @@ module.exports = class TraceObject extends EventEmitter {
 
       let val = props[prop]
       let didWarn = false
-      let lastTime = 0
       if (typeof val === 'object') {
         for (let time in val) {
           if (!time.match(/^[+-]?(?:\d+?(?:\.\d+?)?|\.\d+?)?$/)) {
@@ -131,11 +115,6 @@ module.exports = class TraceObject extends EventEmitter {
             continue
           }
           let t = parseFloat(time)
-          if (time.match(/^[+-]/)) {
-            t = lastTime + (time.match(/^\+/) ? 1 : -1) *
-              parseFloat(time.substr(1))
-          }
-          lastTime = t
           let v = val[time]
           if (!Array.isArray(v)) v = [v]
           if (property.addKey) property.addKey(t, ...v)

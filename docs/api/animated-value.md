@@ -1,5 +1,7 @@
 # AnimatedValue
-An animated value. This class shouldn't be used directly.
+**extends [`EventEmitter`](https://nodejs.org/api/events.html)**
+
+An animated value.
 
 ## Properties
 ### `defaultValue`
@@ -18,36 +20,60 @@ The `easing` property must be an object containing the following items:
 - `parameters` Array - Additional parameters to be passed to the function
 
 ### `interpolator`
-**Default**: Function that returns the default value
+**Default**: Step interpolator (returns the leftmost key)
 
-Signature: `interpolator(currentTime, keys, deltaTime, interpolatorSettings)`
+Signature: `interpolator(options)`
 
-- `currentTime` Number
-- `keys` Map
-- `deltaTime` Number
-- `interpolatorSettings`: `this`
+- `options` Object
+  - `currentTime` Number
+  - `keys` Map
+  - `deltaTime` Number
+  - `settings`: Interpolator Settings
+  - `defaultValue` Default Value
 
 Returns the value.
 
 A function used for interpolating the key values.
 
 ### `interpolatorSettings`
-Utility.
+An object. Can contain anything and will be passed to the interpolator.
 
 ## Methods
 ### `getValue(currentTime, deltaTime)`
 - `currentTime` Number
 - `deltaTime` Number - set to zero to prevent affecting real-time interpolators
 
-Returns the value at the given time.
+Returns the value at the given time. This emits `change`
+
+### `addKey(time, value, easing, parameters)`
+- `time` Number
+- `value` Any
+- `easing` Function - optional
+- `parameters` Object - optional
+
+Adds a key as specified.
+
+### `removeKey(time)`
+- `time` Number
+
+Removes a key at `time` if it exists.
+
+### `valuesAreEqual(a, b)`
+- `a`, `b` Any - values to compare
+
+Returns true if the values are not strictly equivalent.
+
+## Events
+### `change`
+Emitted when the most recent value has changed. Whether or not two values are identical is determined by `valuesAreEqual`.
 
 ## Static Methods
 ### `applyInterpolator(instance, currentTime, deltaTime)`
-- `instance` AnimatedNumber
+- `instance` AnimatedValue
 - `currentTime` Number
 - `deltaTime` Number
 
-See above.
+See above. (Use `getValue` instead, unless implementing `getValue`)
 
 ### `resolveKey(keys, time, defaultValue)`
 - `keys` Map

@@ -1,5 +1,7 @@
 const Trace = require('../trace')
 
+// TODO: allow specifying canvas constructor
+
 let CanvasConstructor
 let ImageConstructor
 let loadCanvas = function () {

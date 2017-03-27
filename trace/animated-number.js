@@ -8,7 +8,7 @@ module.exports = class AnimatedNumber extends AnimatedValue {
     this.interpolator = AnimatedNumber.interpolator
   }
 
-  static interpolator (currentTime, keys, defaultValue) {
+  static interpolator ({ currentTime, keys, defaultValue }) {
     // find closest keys before and after currentTime
     let closestLeft = -Infinity
     let closestRight = Infinity
@@ -41,13 +41,15 @@ module.exports = class AnimatedNumber extends AnimatedValue {
     return (right[0] - left[0]) * easingValue + left[0]
   }
 
-  static springInterpolator (currentTime, keys, defaultValue, deltaTime,
-      interpolatorSettings) {
+  static springInterpolator ({ currentTime, keys, defaultValue, deltaTime,
+      settings }) {
     // get the interpolated value from the default interpolator
-    let target = AnimatedNumber.interpolator(currentTime, keys, defaultValue)
+    let target = AnimatedNumber.interpolator({
+      currentTime, keys, defaultValue, deltaTime, settings
+    })
 
     // make sure springPosition and springVelocity exist
-    if (!interpolatorSettings.hasOwnProperty('springPosition')) {
+    if (!settings.hasOwnProperty('springPosition')) {
       // find closest key
       let closestLeft = -Infinity
       let closestRight = Infinity
@@ -57,28 +59,28 @@ module.exports = class AnimatedNumber extends AnimatedValue {
       }
       // set springPosition to the closest key's value, 0 otherwise
       if (Number.isFinite(closestLeft)) {
-        interpolatorSettings.springPosition = AnimatedValue
+        settings.springPosition = AnimatedValue
           .resolveKey(keys, closestLeft, defaultValue)[0]
       } else if (Number.isFinite(closestRight)) {
-        interpolatorSettings.springPosition = AnimatedValue
+        settings.springPosition = AnimatedValue
           .resolveKey(keys, closestRight, defaultValue)[0]
-      } else interpolatorSettings.springPosition = defaultValue
+      } else settings.springPosition = defaultValue
       // initial velocity is always 0
-      interpolatorSettings.springVelocity = 0
+      settings.springVelocity = 0
     }
 
-    let x = interpolatorSettings.springPosition // current value
-    let v = interpolatorSettings.springVelocity // velocity
-    let f = interpolatorSettings.spring[0] | 0  // force
-    let d = interpolatorSettings.spring[1] | 0  // deceleration factor
+    let x = settings.springPosition // current value
+    let v = settings.springVelocity // velocity
+    let f = settings.spring[0] | 0  // force
+    let d = settings.spring[1] | 0  // deceleration factor
 
     // magic
     v = (v + f * deltaTime * (target - x)) * (1 / (1 + d * deltaTime))
     x += v * deltaTime
 
     // store variables
-    interpolatorSettings.springPosition = x
-    interpolatorSettings.springVelocity = v
+    settings.springPosition = x
+    settings.springVelocity = v
 
     return x
   }

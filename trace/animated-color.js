@@ -14,8 +14,8 @@ module.exports = class AnimatedColor extends AnimatedValue {
     this.interpolator = AnimatedColor.interpolator
   }
 
-  static interpolator (currentTime, keys, defaultValue, deltaTime,
-      interpolatorSettings) {
+  static interpolator ({ currentTime, keys, defaultValue, deltaTime,
+      settings }) {
     // find closest keys before and after current time
     let closestLeft = -Infinity
     let closestRight = Infinity
@@ -48,8 +48,8 @@ module.exports = class AnimatedColor extends AnimatedValue {
     if (!Number.isFinite(closestRight)) return leftColor.rgb().string()
 
     let model = 'rgb'
-    if (validModels.includes(interpolatorSettings.model)) {
-      model = interpolatorSettings.model
+    if (validModels.includes(settings.model)) {
+      model = settings.model
     }
 
     // interpolate value
@@ -72,6 +72,19 @@ module.exports = class AnimatedColor extends AnimatedValue {
       result[i] = (r - l) * easingValue + l
     }
 
+    if (settings.type === 'array') return color(result, model).rgb().array()
+    if (settings.type === 'number') {
+      // reverse array and sum all entries with increasing factor
+      // this also removes the need to check for alpha
+      let rgb = color(result, model).rgb().array().reverse()
+      let factor = 256
+      let number = 0
+      for (let value of rgb) {
+        number += value * factor
+        factor **= 2
+      }
+      return number
+    }
     return color(result, model).rgb().string()
   }
 }

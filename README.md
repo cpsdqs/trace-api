@@ -1,18 +1,13 @@
 # Trace
-Canvas Animation Engine
+Canvas Animation API
 
 [Documentation](https://github.com/cpsdqs/trace-api/tree/master/docs/index.md)
 
 ## Usage
-### In browser
-```
+### In Browser
+```shell
 $ npm install --dev
+$ npm run webpack
 ```
 
-Then
-```
-$ ./node_modules/webpack/bin/webpack.js
-```
-(or just `webpack`)
-
-Then include `dist/bundle.js`
+Then include `dist/bundle.js` and use `window.Trace`.
