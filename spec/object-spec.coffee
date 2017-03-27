@@ -1,4 +1,5 @@
 TraceObject = require('..').Object
+glMatrix = require 'gl-matrix'
 
 toArray = (iterator) ->
   result = []
@@ -301,4 +302,135 @@ describe 'Object', ->
       for child, i in sortedChildren
         expect(child).toBe children[i]
 
-  # TODO: draw, drawChildren, but not drawSelf
+  describe 'draw', ->
+    it 'should call drawChildren and drawSelf with time and delta time', ->
+      object = new TraceObject
+
+      dcSpy = spyOn object, 'drawChildren'
+      dsSpy = spyOn object, 'drawSelf'
+
+      ctx = {} # dummy
+
+      object.draw ctx, glMatrix.mat4.create(), 2, 3
+
+      expect(dcSpy).toHaveBeenCalled()
+      expect(dsSpy).toHaveBeenCalled()
+      expect(dcSpy.calls.mostRecent().args[0]).toBe ctx
+      expect(dcSpy.calls.mostRecent().args[2]).toBe 2
+      expect(dcSpy.calls.mostRecent().args[3]).toBe 3
+      expect(dsSpy.calls.mostRecent().args[0]).toBe ctx
+      expect(dsSpy.calls.mostRecent().args[2]).toBe 2
+      expect(dsSpy.calls.mostRecent().args[3]).toBe 3
+
+    it 'should .transform.getMatrix with the correct time', ->
+      object = new TraceObject
+
+      transformSpy = spyOn(object.transform, 'getMatrix').and.callThrough()
+
+      object.draw {}, glMatrix.mat4.create(), 5, 1
+
+      expect(transformSpy).toHaveBeenCalled()
+      expect(transformSpy.calls.mostRecent().args[0]).toBe 5
+      expect(transformSpy.calls.mostRecent().args[1]).toBe 1
+
+    it 'should apply the object transform', ->
+      object = new TraceObject
+
+      ctx = {} # dummy
+
+      parent = glMatrix.mat4.create()
+
+      # do some random transformations
+      for [0...10]
+        switch Math.floor 3 * Math.random()
+          when 0
+            glMatrix.mat4.rotateX parent, parent, Math.random() * 2 * Math.PI
+          when 1
+            glMatrix.mat4.translate parent, parent, [Math.random(), 4, 1]
+          when 2
+            glMatrix.mat4.scale parent, parent, [2, Math.random(), 1]
+
+      # now override the object's transform with random transformations
+      child = glMatrix.mat4.create()
+      object.transform.getMatrix -> child
+
+      for [0...10]
+        switch Math.floor 3 * Math.random()
+          when 0
+            glMatrix.mat4.rotateX parent, parent, Math.random() * 2 * Math.PI
+          when 1
+            glMatrix.mat4.translate parent, parent, [Math.random(), -2, 1]
+          when 2
+            glMatrix.mat4.scale parent, parent, [1, Math.random(), 3]
+
+      # spy on drawSelf to get the actual matrix
+      drawSpy = spyOn object, 'drawSelf'
+
+      # now call draw
+      object.draw {}, parent, 0, 0
+
+      expect(drawSpy).toHaveBeenCalled()
+
+      # multiply parent and child matrix
+      multiplied = glMatrix.mat4.create()
+      glMatrix.mat4.multiply multiplied, parent, child
+
+      expect(drawSpy.calls.mostRecent().args[1]).toEqual multiplied
+
+  describe 'drawChildren', ->
+    # dummy ctx
+    ctx = new Proxy {}, {
+      get: (target, name) ->
+        return -> # in case a function needs to be called
+    }
+
+    it 'should call .draw on all children', ->
+      parent = new TraceObject
+      children = (new TraceObject for [0...10])
+      parent.addChild child for child in children
+
+      transform = glMatrix.mat4.create()
+
+      drawCalls = 0
+      for child in children
+        child.draw = (c, trf, t, dt) ->
+          drawCalls++
+          expect(c).toBe ctx
+          expect(trf).toEqual transform
+          expect(t).toBe 5
+          expect(dt).toBe 3
+
+      parent.drawChildren ctx, transform, 5, 3
+
+      expect(drawCalls).toBe 10
+
+    it 'should not draw disabled children', ->
+      parent = new TraceObject
+      child = new TraceObject
+      child.enabled.addKey 0, false
+      parent.addChild child
+
+      drawSpy = spyOn child, 'draw'
+      parent.drawChildren ctx, glMatrix.mat4.create(), 0, 0
+      expect(drawSpy).not.toHaveBeenCalled()
+
+    it 'should sort the children correctly', ->
+      # not checking if it calls .sortChildren
+
+      object = new TraceObject
+      below = new TraceObject
+      above = new TraceObject
+
+      # add in reverse order
+      object.addChild above
+      object.addChild below
+
+      above.zIndex.defaultValue = 1
+
+      drawn = []
+      below.draw = above.draw = -> drawn.push this
+
+      object.drawChildren ctx, glMatrix.mat4.create(), 0, 0
+
+      expect(drawn[0]).toBe below
+      expect(drawn[1]).toBe above
