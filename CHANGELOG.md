@@ -1,5 +1,5 @@
 # Changelog
-## current
+## 0.2.0
 ### Added
 - `Subcontext`: `alwaysRedraw` option to only redraw children if current time changes when false
 - Bezier function cache in `Easing`
