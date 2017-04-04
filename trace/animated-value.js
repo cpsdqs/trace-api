@@ -17,7 +17,7 @@ class AnimatedValue extends EventEmitter {
     // emit `change` if the value changed
     if (this.valuesAreEqual(value, this.lastValue)) {
       this.lastValue = value
-      this.emit('change', value)
+      this.emit('change', currentTime, deltaTime, value)
     }
 
     return value
